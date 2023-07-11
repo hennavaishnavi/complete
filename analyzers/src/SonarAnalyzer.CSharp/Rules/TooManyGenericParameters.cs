@@ -45,13 +45,15 @@ namespace SonarAnalyzer.Rules.CSharp
                 {
                     var typeDeclaration = (TypeDeclarationSyntax)c.Node;
 
+                    var treeId = ObjectIds.Generator.GetId(c.Node.SyntaxTree, out _);
+                    ObjectIds.Log(c.SemanticModel, $"RuleSemanticModel for tree {treeId}; {c.Node.SyntaxTree.FilePath}");
+
                     if (c.IsRedundantPositionalRecordContext()
                         || typeDeclaration.TypeParameterList == null
                         || typeDeclaration.TypeParameterList.Parameters.Count <= MaxNumberOfGenericParametersInClass)
                     {
                         return;
                     }
-
                     c.ReportIssue(Diagnostic.Create(Rule,
                                                     typeDeclaration.Identifier.GetLocation(),
                                                     typeDeclaration.Identifier.ValueText,

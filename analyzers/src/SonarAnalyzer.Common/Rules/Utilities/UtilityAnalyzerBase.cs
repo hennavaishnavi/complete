@@ -19,6 +19,7 @@
  */
 
 using System.IO;
+using System.Runtime.Serialization;
 using Google.Protobuf;
 using SonarAnalyzer.Protobuf;
 
@@ -74,6 +75,7 @@ namespace SonarAnalyzer.Rules
         where TSyntaxKind : struct
         where TMessage : class, IMessage, new()
     {
+
         protected abstract ILanguageFacade<TSyntaxKind> Language { get; }
         protected abstract string FileName { get; }
         protected abstract TMessage CreateMessage(SyntaxTree syntaxTree, SemanticModel semanticModel);
@@ -88,14 +90,14 @@ namespace SonarAnalyzer.Rules
             context.RegisterCompilationAction(context =>
             {
                 ReadParameters(context);
+                Debugger.Launch();
                 if (!IsAnalyzerEnabled)
                 {
                     return;
                 }
-
                 var treeMessages = context.Compilation.SyntaxTrees
                     .Where(x => ShouldGenerateMetrics(context, x))
-                    .Select(x => CreateMessage(x, context.Compilation.GetSemanticModel(x)));
+                    .Select(x => MessageSelector(context, x));
 
                 var allMessages = CreateAnalysisMessages(context)
                     .Concat(treeMessages)
@@ -109,6 +111,13 @@ namespace SonarAnalyzer.Rules
                     message.WriteDelimitedTo(stream);
                 }
             });
+        private TMessage MessageSelector(SonarCompilationReportingContext context, SyntaxTree x)
+        {
+            var semModel = context.Compilation.GetSemanticModel(x);
+            var treeId = ObjectIds.Generator.GetId(x, out _);
+            ObjectIds.Log(semModel, $"UtilitySemanticModel for tree {treeId}; {x.FilePath}");
+            return CreateMessage(x, semModel);
+        }
 
         protected virtual bool ShouldGenerateMetrics(SyntaxTree tree) =>
             // The results of Metrics and CopyPasteToken analyzers are not needed for Test projects yet the plugin side expects the protobuf files, so we create empty ones.

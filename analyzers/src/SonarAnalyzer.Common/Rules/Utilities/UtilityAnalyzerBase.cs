@@ -111,6 +111,7 @@ namespace SonarAnalyzer.Rules
                     message.WriteDelimitedTo(stream);
                 }
             });
+
         private TMessage MessageSelector(SonarCompilationReportingContext context, SyntaxTree x)
         {
             var semModel = context.Compilation.GetSemanticModel(x);

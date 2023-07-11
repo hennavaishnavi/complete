@@ -115,8 +115,9 @@ namespace SonarAnalyzer.Rules
         private TMessage MessageSelector(SonarCompilationReportingContext context, SyntaxTree x)
         {
             var semModel = context.Compilation.GetSemanticModel(x);
+            var compilationId = ObjectIds.Generator.GetId(context.Compilation, out _);
             var treeId = ObjectIds.Generator.GetId(x, out _);
-            ObjectIds.Log(semModel, $"UtilitySemanticModel for tree {treeId}; {x.FilePath}");
+            ObjectIds.Log(semModel, $"UtilitySemanticModel for tree {treeId} from compilation {compilationId}; {x.FilePath}");
             return CreateMessage(x, semModel);
         }
 

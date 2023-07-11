@@ -18,6 +18,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
+using Microsoft.CodeAnalysis;
+
 namespace SonarAnalyzer.Rules.CSharp
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -44,9 +46,9 @@ namespace SonarAnalyzer.Rules.CSharp
                 c =>
                 {
                     var typeDeclaration = (TypeDeclarationSyntax)c.Node;
-
+                    var compilationId = ObjectIds.Generator.GetId(c.Compilation, out _);
                     var treeId = ObjectIds.Generator.GetId(c.Node.SyntaxTree, out _);
-                    ObjectIds.Log(c.SemanticModel, $"RuleSemanticModel for tree {treeId}; {c.Node.SyntaxTree.FilePath}");
+                    ObjectIds.Log(c.SemanticModel, $"RuleSemanticModel for tree {treeId} from compilation {compilationId}; {c.Node.SyntaxTree.FilePath}");
 
                     if (c.IsRedundantPositionalRecordContext()
                         || typeDeclaration.TypeParameterList == null

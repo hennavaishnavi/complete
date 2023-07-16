@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
@@ -8,8 +9,21 @@ namespace SonarAnalyzer.Helpers
 {
     public static class ObjectIds
     {
-        private static readonly object Locker = new object();
+        private static readonly BlockingCollection<string> Strings;
         public static readonly ObjectIDGenerator Generator = new();
+
+        static ObjectIds()
+        {
+            Strings = new();
+            var enumerator = Strings.GetConsumingEnumerable();
+            Task.Factory.StartNew(() =>
+            {
+                foreach (var s in enumerator)
+                {
+                    File.AppendAllText(@"E:\Logging.txt", s);
+                }
+            }, TaskCreationOptions.LongRunning);
+        }
 
         public static long Log<T>(T obj) =>
             Log(obj, obj.ToString());
@@ -19,10 +33,7 @@ namespace SonarAnalyzer.Helpers
 
         public static long Log<T>(T identifier, long id)
         {
-            lock (Locker)
-            {
-                File.AppendAllText(@"E:\Logging.txt", $"Identifier: {identifier}; Id: {id}{Environment.NewLine}");
-            }
+            Strings.Add($"Identifier: {identifier}; Id: {id}{Environment.NewLine}");
             return id;
         }
     }

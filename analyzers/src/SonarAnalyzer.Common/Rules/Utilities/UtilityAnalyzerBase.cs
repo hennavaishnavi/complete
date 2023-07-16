@@ -90,7 +90,6 @@ namespace SonarAnalyzer.Rules
             context.RegisterCompilationAction(context =>
             {
                 ReadParameters(context);
-                Debugger.Launch();
                 if (!IsAnalyzerEnabled)
                 {
                     return;

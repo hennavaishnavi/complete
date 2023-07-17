@@ -104,18 +104,39 @@ public abstract class SonarAnalysisContextBase<TContext> : SonarAnalysisContextB
 
     public bool IsUnchanged(SyntaxTree tree)
     {
-        ImmutableHashSet<string> unchangedCache;
-        if (UnchangedFilesCache.TryGetValue(Compilation, out var unchanged))
+        ImmutableHashSet<string> unchangedFiles;
+        if (UnchangedFilesCache.TryGetValue(Compilation, out var unchangedFilesFromCache))
         {
-            unchangedCache = unchanged;
+            // Found in cache
+            unchangedFiles = unchangedFilesFromCache;
         }
         else
         {
-            var newChache = CreateUnchangedFilesHashSet();
-            UnchangedFilesCache.Add(Compilation, newChache);
-            unchangedCache = newChache;
+            var newUnchangedFiles = CreateUnchangedFilesHashSet();
+            // check again, there might be a cache available by now
+            if (UnchangedFilesCache.TryGetValue(Compilation, out unchangedFilesFromCache))
+            {
+                unchangedFiles = unchangedFilesFromCache;
+            }
+            else
+            {
+                lock (Compilation)
+                {
+                    // check again, there might be a cache available by now
+                    if (UnchangedFilesCache.TryGetValue(Compilation, out unchangedFilesFromCache))
+                    {
+                        unchangedFiles = unchangedFilesFromCache;
+                    }
+                    else
+                    {
+                        // We can be sure, that there is no cache yet associated with the Compilation
+                        UnchangedFilesCache.Add(Compilation, newUnchangedFiles);
+                        unchangedFiles = newUnchangedFiles;
+                    }
+                }
+            }
         }
-        return unchangedCache.Contains(tree.FilePath);
+        return unchangedFiles.Contains(tree.FilePath);
     }
 
     public bool HasMatchingScope(ImmutableArray<DiagnosticDescriptor> descriptors)

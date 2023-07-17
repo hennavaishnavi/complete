@@ -34,6 +34,8 @@ internal static class SyntaxTreeExtensions
             return false;
         }
         var cache = GeneratedCodeCache.GetOrCreateValue(compilation);
-        return cache.GetOrAdd(tree, generatedCodeRecognizer.IsGenerated);
+        return cache.TryGetValue(tree, out var result)
+            ? result
+            : cache.GetOrAdd(tree, generatedCodeRecognizer.IsGenerated(tree));
     }
 }

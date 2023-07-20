@@ -38,6 +38,7 @@ namespace SonarAnalyzer.Helpers
             {
                 context.EnableConcurrentExecution();
             }
+
             Initialize(new SonarAnalysisContext(context, SupportedDiagnostics));
         }
 
@@ -49,8 +50,31 @@ namespace SonarAnalyzer.Helpers
             {
                 return result;
             }
+
             return true;
         }
+
+        protected static Diagnostic CreateDiagnostic(DiagnosticDescriptor descriptor, Location location, params object[] messageArgs) =>
+            CreateDiagnostic(descriptor, location, null, null, messageArgs);
+
+        protected static Diagnostic CreateDiagnostic(DiagnosticDescriptor descriptor,
+                                                     Location location,
+                                                     IEnumerable<Location> additionalLocations,
+                                                     params object[] messageArgs) =>
+            CreateDiagnostic(descriptor, location, additionalLocations, null, messageArgs);
+
+        protected static Diagnostic CreateDiagnostic(DiagnosticDescriptor descriptor,
+                                                     Location location,
+                                                     ImmutableDictionary<string, string> properties,
+                                                     params object[] messageArgs) =>
+            CreateDiagnostic(descriptor, location, null, properties, messageArgs);
+
+        protected static Diagnostic CreateDiagnostic(DiagnosticDescriptor descriptor,
+                                                     Location location,
+                                                     IEnumerable<Location> additionalLocations,
+                                                     ImmutableDictionary<string, string> properties,
+                                                     params object[] messageArgs) =>
+            Diagnostic.Create(descriptor, location, additionalLocations, properties, messageArgs);
     }
 
     public abstract class SonarDiagnosticAnalyzer<TSyntaxKind> : SonarDiagnosticAnalyzer
@@ -62,6 +86,6 @@ namespace SonarAnalyzer.Helpers
         public sealed override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         protected SonarDiagnosticAnalyzer(string diagnosticId) =>
-           Rule = Language.CreateDescriptor(diagnosticId, MessageFormat);
+            Rule = Language.CreateDescriptor(diagnosticId, MessageFormat);
     }
 }

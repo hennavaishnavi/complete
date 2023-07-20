@@ -129,14 +129,14 @@ namespace SonarAnalyzer.Rules
 
             if (bothSideBool && !bothSideFalse && !bothSideTrue)
             {
-                context.ReportIssue(Diagnostic.Create(SupportedDiagnostics[0], thenBranch.CreateLocation(elseBranch)));
+                context.ReportIssue(CreateDiagnostic(SupportedDiagnostics[0], thenBranch.CreateLocation(elseBranch)));
             }
             if (thenIsBooleanLiteral ^ elseIsBooleanLiteral)
             {
                 // one side is boolean literal, the other is NOT boolean literal
                 var booleanLiteralSide = thenIsBooleanLiteral ? thenBranch : elseBranch;
 
-                context.ReportIssue(Diagnostic.Create(SupportedDiagnostics[0], booleanLiteralSide.GetLocation()));
+                context.ReportIssue(CreateDiagnostic(SupportedDiagnostics[0], booleanLiteralSide.GetLocation()));
             }
         }
 
@@ -162,7 +162,7 @@ namespace SonarAnalyzer.Rules
                     ? CalculateExtendedLocation(node, false)
                     : CalculateExtendedLocation(node, reportOnTrue == leftIsTrue);
 
-                context.ReportIssue(Diagnostic.Create(SupportedDiagnostics[0], errorLocation));
+                context.ReportIssue(CreateDiagnostic(SupportedDiagnostics[0], errorLocation));
                 return true;
             }
             return false;
@@ -176,7 +176,7 @@ namespace SonarAnalyzer.Rules
         {
             if (isBooleanLiteralKind(node) && GetLocation() is { } location)
             {
-                context.ReportIssue(Diagnostic.Create(SupportedDiagnostics[0], location));
+                context.ReportIssue(CreateDiagnostic(SupportedDiagnostics[0], GetLocation()));
             }
 
             Location GetLocation() =>

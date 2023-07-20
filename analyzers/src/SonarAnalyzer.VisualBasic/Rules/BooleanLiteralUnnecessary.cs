@@ -53,7 +53,7 @@ namespace SonarAnalyzer.Rules.VisualBasic
             var logicalNotOperand = logicalNot.Operand.RemoveParentheses();
             if (IsTrue(logicalNotOperand) || IsFalse(logicalNotOperand))
             {
-                context.ReportIssue(Diagnostic.Create(Rule, logicalNot.Operand.GetLocation()));
+                context.ReportIssue(CreateDiagnostic(Rule, logicalNot.Operand.GetLocation()));
             }
         }
 

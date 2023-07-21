@@ -67,7 +67,7 @@ public abstract class SymbolicRuleCheck : SymbolicCheck
 
     protected void ReportIssue(DiagnosticDescriptor rule, SyntaxNode syntax, IEnumerable<Location> additionalLocations, params object[] messageArgs)
     {
-        var location = syntax.GetLocation();
+        var location = syntax.GetLocation().EnsureMappedLocation();
         if (reportedDiagnostics.Add(location))
         {
             context.ReportIssue(Diagnostic.Create(rule, location, additionalLocations, messageArgs));

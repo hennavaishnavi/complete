@@ -104,7 +104,7 @@ namespace SonarAnalyzer.Helpers
                     attributeName.EndsWith(generatedCodeAttribute, StringComparison.Ordinal)));
         }
 
-        private static bool HasGeneratedFileName(SyntaxTree tree)
+        public static bool HasGeneratedFileName(SyntaxTree tree)
         {
             var fileName = Path.GetFileName(tree.FilePath).ToUpperInvariant();
             return Array.Exists(GeneratedFileParts, fileName.Contains);

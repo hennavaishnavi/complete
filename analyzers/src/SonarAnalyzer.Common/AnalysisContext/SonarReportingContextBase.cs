@@ -20,15 +20,90 @@
 
 namespace SonarAnalyzer.AnalysisContext;
 
+public class SonarDiagnostic : Diagnostic
+{
+    public override DiagnosticDescriptor Descriptor { get; }
+    public override string Id { get; }
+    public override DiagnosticSeverity Severity { get; }
+    public override int WarningLevel { get; }
+    public override bool IsSuppressed { get; }
+    public override Location Location { get; }
+    public override IReadOnlyList<Location> AdditionalLocations { get; }
+    public string Message { get; }
+
+    public override ImmutableDictionary<string, string> Properties { get; }
+
+    public SonarDiagnostic(DiagnosticDescriptor descriptor, Location location, IReadOnlyList<Location> additionalLocations, string message, ImmutableDictionary<string, string> properties)
+    {
+        Properties = properties;
+        Descriptor = descriptor;
+        Id = descriptor.Id;
+        Severity = descriptor.DefaultSeverity;
+        WarningLevel = GetDefaultWarningLevel(descriptor.DefaultSeverity);
+        IsSuppressed = false;
+        Location = location;
+        AdditionalLocations = additionalLocations;
+        Message = message;
+    }
+
+    public override string GetMessage(IFormatProvider formatProvider = null) => Message;
+
+    public override int GetHashCode() => HashCode.Combine(Descriptor, Message, Location, Severity, WarningLevel);
+
+    public override bool Equals(object obj) => Equals(obj as Diagnostic);
+
+    public override bool Equals(Diagnostic obj)
+    {
+        if (!(obj is SonarDiagnostic other))
+        {
+            return false;
+        }
+
+        return Descriptor.Equals(other.Descriptor) &&
+               Message == other.Message &&
+               Location == other.Location &&
+               Severity == other.Severity &&
+               WarningLevel == other.WarningLevel;
+    }
+
+    // Copied from Diagnostic.GetDefaultWarningLevel
+    private static int GetDefaultWarningLevel(DiagnosticSeverity severity)
+    {
+        if (severity == DiagnosticSeverity.Warning)
+        {
+            return 1;
+        }
+
+        return severity == DiagnosticSeverity.Error ? 0 : 4;
+    }
+}
+
 public abstract class SonarReportingContextBase<TContext> : SonarAnalysisContextBase<TContext>
 {
     private protected abstract ReportingContext CreateReportingContext(Diagnostic diagnostic);
 
     protected SonarReportingContextBase(SonarAnalysisContext analysisContext, TContext context) : base(analysisContext, context) { }
 
+    private Diagnostic EnsureDiagnosticLocation(Diagnostic diagnostic)
+    {
+        var mappedLocation = diagnostic.Location.EnsureMappedLocation();
+
+        if (!mappedLocation.GetMappedLineSpan().HasMappedPath)
+        {
+            return diagnostic;
+        }
+
+        return new SonarDiagnostic(diagnostic.Descriptor,
+            mappedLocation,
+            diagnostic.AdditionalLocations.Select(l => l.EnsureMappedLocation()).ToImmutableList(),
+            diagnostic.GetMessage(),
+            diagnostic.Properties);
+    }
+
     protected void ReportIssueCore(Diagnostic diagnostic)
     {
-        if (HasMatchingScope(diagnostic.Descriptor) && SonarAnalysisContext.LegacyIsRegisteredActionEnabled(diagnostic.Descriptor, diagnostic.Location?.SourceTree))
+        diagnostic = EnsureDiagnosticLocation(diagnostic);
+        if (!diagnostic.Location.IsWithinGeneratedContent() && HasMatchingScope(diagnostic.Descriptor) && SonarAnalysisContext.LegacyIsRegisteredActionEnabled(diagnostic.Descriptor, diagnostic.Location?.SourceTree))
         {
             var reportingContext = CreateReportingContext(diagnostic);
             if (reportingContext is { Compilation: { } compilation, Diagnostic.Location: { Kind: LocationKind.SourceFile, SourceTree: { } tree } } && !compilation.ContainsSyntaxTree(tree))

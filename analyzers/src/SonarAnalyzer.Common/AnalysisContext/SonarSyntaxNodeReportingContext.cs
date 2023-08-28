@@ -51,7 +51,7 @@ public sealed class SonarSyntaxNodeReportingContext : SonarTreeReportingContextB
 
     public override bool ShouldAnalyzeTree(SyntaxTree tree, GeneratedCodeRecognizer generatedCodeRecognizer)
     {
-        if (tree.FilePath.EndsWith(".g.cs") && !Node.GetLocation().GetMappedLineSpan().HasMappedPath)
+        if (GeneratedCodeRecognizer.IsRazorGeneratedFile(tree) && !Node.GetLocation().GetMappedLineSpan().HasMappedPath)
         {
             return false;
         }

@@ -1,0 +1,10 @@
+﻿<button @onclick="async (e) => await ButtonClicked(e)">
+    My button
+</button>
+
+@code {
+    private async Task ButtonClicked(MouseEventArgs e) // Noncompliant - FP
+    {
+        await Task.Delay(1000);
+    }
+}

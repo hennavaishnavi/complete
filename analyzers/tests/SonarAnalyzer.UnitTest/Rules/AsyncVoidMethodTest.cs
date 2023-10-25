@@ -27,6 +27,8 @@ namespace SonarAnalyzer.UnitTest.Rules
     {
         private readonly VerifierBuilder builder = new VerifierBuilder<AsyncVoidMethod>();
 
+        public TestContext TestContext { get; set; }
+
         [TestMethod]
         public void AsyncVoidMethod() =>
             builder.AddPaths("AsyncVoidMethod.cs")
@@ -50,6 +52,12 @@ namespace SonarAnalyzer.UnitTest.Rules
         public void AsyncVoidMethod_CSharp11() =>
             builder.AddPaths("AsyncVoidMethod.CSharp11.cs")
                 .WithOptions(ParseOptionsHelper.FromCSharp11)
+                .Verify();
+
+        [TestMethod]
+        public void AsyncVoidMethod_Blazor() =>
+            builder.AddPaths("AsyncVoidMethod.razor")
+                .WithAdditionalFilePath(AnalysisScaffolding.CreateSonarProjectConfig(TestContext, ProjectType.Product))
                 .Verify();
 
         [DataTestMethod]

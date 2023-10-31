@@ -335,6 +335,9 @@ namespace SonarAnalyzer.Extensions
             }
         }
 
+        public static bool IsInBlazorContext(this SyntaxNode node) =>
+            node.SyntaxTree.GetCompilationUnitRoot() is { Usings: var usings } && usings.Any(x => x.Name.ToString() == "Microsoft.AspNetCore.Components");
+
         public static bool IsParentKind<T>(this SyntaxNode node, SyntaxKind kind, out T result) where T : SyntaxNode
         {
             if (node?.Parent?.IsKind(kind) is true && node.Parent is T t)

@@ -86,6 +86,41 @@ namespace SonarAnalyzer.UnitTest.Extensions
             ExtensionsCS.GetPreviousStatementsCurrentBlock(parent).Should().BeEmpty();
         }
 
+        [DataTestMethod]
+        [DataRow("Microsoft.AspNetCore.Components")]
+        [DataRow("global::Microsoft.AspNetCore.Components")]
+        [DataRow("Microsoft.AspNetCore.Components.Web")]
+        [DataRow("global::Microsoft.AspNetCore.Components.Web")]
+        public void IsInBlazorContext_WithBlazorFile_ReturnsTrue(string packageNamespace)
+        {
+            var code = $@"using {packageNamespace};
+
+public abstract class SimpleComponent : ComponentBase
+{{
+    [Parameter]
+    public int Param {{ get; set; }}
+}}
+";
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var node = GetFirstNodeOfKind(syntaxTree, SyntaxKind.PropertyDeclaration);
+
+            ExtensionsCS.IsInBlazorContext(node).Should().BeTrue();
+        }
+
+        [TestMethod]
+        public void IsInBlazorContext_WithCsharpFile_ReturnsFalse()
+        {
+            const string code = @"
+abstract class SimpleClass
+{
+    public int Param { get; set; }
+}";
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var node = GetFirstNodeOfKind(syntaxTree, SyntaxKind.PropertyDeclaration);
+
+            ExtensionsCS.IsInBlazorContext(node).Should().BeFalse();
+        }
+
         [TestMethod]
         public void ArrowExpressionBody_WithNotExpectedNode_ReturnsNull()
         {
@@ -740,7 +775,7 @@ public class X
         public void ArgumentList_CS_InvocationObjectCreation(string statement)
         {
             var code = $$"""
-                public class C(int p) {    
+                public class C(int p) {
                     public void M(int p) {
                         {{statement}}
                     }
@@ -763,9 +798,9 @@ public class X
                 public class C: Base
                 {
                     public C(): $${{keyword}}(1)$$ { }
-                    public C(int  p): base(p) { }   
+                    public C(int  p): base(p) { }
                 }
-                
+
                 """;
             var node = NodeBetweenMarkers(code, LanguageNames.CSharp);
             var argumentList = ExtensionsCS.ArgumentList(node).Arguments;
@@ -791,7 +826,7 @@ public class X
         public void ArgumentList_CS_NoList(string statement)
         {
             var code = $$"""
-                public class C {    
+                public class C {
                     public void M() {
                         {{statement}}
                     }
@@ -811,7 +846,7 @@ public class X
         public void ArgumentList_CS_UnsupportedNodeKinds(string statement)
         {
             var code = $$"""
-                public class C {    
+                public class C {
                     public void M() {
                         {{statement}}
                     }
@@ -1013,7 +1048,7 @@ public class X
             var node = NodeBetweenMarkers($$"""
                 $$public {{type}} C(int p)
                 {
-                    
+
                 }$$
                 """, LanguageNames.CSharp);
             var actual = ExtensionsCS.ParameterList(node);
@@ -1176,6 +1211,9 @@ public class X
 
         private static SyntaxToken GetFirstTokenOfKind(SyntaxTree syntaxTree, SyntaxKind kind) =>
             syntaxTree.GetRoot().DescendantTokens().First(token => token.IsKind(kind));
+
+        private static SyntaxNode GetFirstNodeOfKind(SyntaxTree syntaxTree, SyntaxKind kind) =>
+            syntaxTree.GetRoot().DescendantNodes().First(token => token.IsKind(kind));
 
         private static SyntaxTree GetSyntaxTree(string content, string fileName = null) =>
             SolutionBuilder

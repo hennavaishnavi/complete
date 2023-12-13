@@ -111,7 +111,7 @@ namespace SonarAnalyzer.Rules
                 using var stream = File.Create(Path.Combine(parameters.OutPath, FileName));
                 foreach (var message in allMessages)
                 {
-                    stream.AppendDelimitedProtobuf(message);
+                    message.WriteDelimitedTo(stream);
                 }
             });
 

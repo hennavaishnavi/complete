@@ -8,10 +8,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common Solution Items", "Co
 		src\AssemblyInfo.Shared.cs = src\AssemblyInfo.Shared.cs
 		..\azure-pipelines.yml = ..\azure-pipelines.yml
 		NuGet.Config = NuGet.Config
+		..\README.md = ..\README.md
 		src\Signing.cs = src\Signing.cs
 		packaging\SonarAnalyzer.CSharp.nuspec = packaging\SonarAnalyzer.CSharp.nuspec
 		packaging\SonarAnalyzer.VisualBasic.nuspec = packaging\SonarAnalyzer.VisualBasic.nuspec
-		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B7233F78-E142-4882-B084-7C83BE472109}"
@@ -58,7 +58,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AnalysisConfig", "AnalysisC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarAnalyzer.SourceGenerators", "src\SonarAnalyzer.SourceGenerators\SonarAnalyzer.SourceGenerators.csproj", "{76D6EBB8-D2B0-41C1-8880-027EC78CB7FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SonarAnalyzer.Net8.UnitTest", "tests\SonarAnalyzer.Net8.UnitTest\SonarAnalyzer.Net8.UnitTest.csproj", "{DB0A158B-D003-47ED-8209-E70277EB0693}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarAnalyzer.Net8.UnitTest", "tests\SonarAnalyzer.Net8.UnitTest\SonarAnalyzer.Net8.UnitTest.csproj", "{DB0A158B-D003-47ED-8209-E70277EB0693}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarAnalyzer.Protobuf", "D:\Projects\sonar-dotnet\analyzers\src\SonarAnalyzer.Protobuf\SonarAnalyzer.Protobuf.csproj", "{37A68AE0-9BEA-4803-86C1-668F1D786095}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SonarAnalyzer.Protobuf.Test", "D:\Projects\sonar-dotnet\analyzers\tests\SonarAnalyzer.Protobuf.Test\SonarAnalyzer.Protobuf.Test.csproj", "{0262E178-7FC2-4860-AA1A-748FA4A73096}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -102,6 +106,14 @@ Global
 		{DB0A158B-D003-47ED-8209-E70277EB0693}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB0A158B-D003-47ED-8209-E70277EB0693}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB0A158B-D003-47ED-8209-E70277EB0693}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37A68AE0-9BEA-4803-86C1-668F1D786095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37A68AE0-9BEA-4803-86C1-668F1D786095}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37A68AE0-9BEA-4803-86C1-668F1D786095}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37A68AE0-9BEA-4803-86C1-668F1D786095}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0262E178-7FC2-4860-AA1A-748FA4A73096}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0262E178-7FC2-4860-AA1A-748FA4A73096}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0262E178-7FC2-4860-AA1A-748FA4A73096}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0262E178-7FC2-4860-AA1A-748FA4A73096}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -115,6 +127,7 @@ Global
 		{C086048C-D183-4B4D-9D3C-A6E191F19680} = {0C3E0519-DB5C-47C0-ABB3-9D1FB23DFBAF}
 		{E044950A-098B-4090-B4FB-8D6BD086828B} = {0C3E0519-DB5C-47C0-ABB3-9D1FB23DFBAF}
 		{DB0A158B-D003-47ED-8209-E70277EB0693} = {B7233F78-E142-4882-B084-7C83BE472109}
+		{0262E178-7FC2-4860-AA1A-748FA4A73096} = {B7233F78-E142-4882-B084-7C83BE472109}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4259CA71-C565-42DD-8D58-F59819A11065}
